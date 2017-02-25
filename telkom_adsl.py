@@ -23,6 +23,9 @@ REMAINDER_KEY = 'remainder'
 USAGE_SUBSTRING = 'usage'
 UPDATING_MESSAGE = 'Updating...'
 ERROR_MESSAGE = 'Error'
+CONF_DEFAULT_SECTION = 'default'
+CONF_USERNAME = 'username'
+CONF_PASSWORD = 'password'
 
 # Path constants
 CONF_TEMPLATE_PATH = '{0}/conf/{1}'
@@ -131,9 +134,9 @@ def main():
     config_parser = ConfigParser.SafeConfigParser()
     with open(CONF_TEMPLATE_PATH.format(app_path, APP_CONF)) as config_file:
         config_parser.readfp(config_file)
-        username = config_parser.get('default', 'username')
-        password = config_parser.get('default', 'password')
-    logger.info('Username:' + username)
+        username = config_parser.get(CONF_DEFAULT_SECTION, CONF_USERNAME)
+        password = config_parser.get(CONF_DEFAULT_SECTION, CONF_PASSWORD)
+    logger.info('Username: ' + username)
     refresh = rumps.MenuItem(REFRESH_MENU, 
                              icon=ICONS_TEMPLATE_PATH.format(app_path, REFRESH_ICON), 
                              dimensions=(16, 16))
