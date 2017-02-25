@@ -8,22 +8,25 @@ import requests
 import rumps
 from bs4 import BeautifulSoup
 
-# Constants
-LOGIN_URL = 'https://secure.telkomsa.net/titracker/servlet/LoginServlet'
-HTTP_HEADERS = {'User-Agent': 'Mozilla/5.0'}
-USERNAME_HTML_ID = 'ID_Field'
-PASSWORD_HTML_ID = 'PW_field'
+# Main constants
+APP_NAME = 'Telkom'
 # example data:
 # {value: 76, label: 'Remaining integrated data', formatted: '30.5 GB' + ' (' +76 + '%)'},
 # {value: 23, label: 'Fixed data usage', formatted: '9.5 GB' + ' (' +23 + '%)'},
 REGEX = 'value:.*?(\d+).*?label:.*?\'(.*?)\'.*?formatted:.*?\'(.*?)\''
 REGEX = REGEX + '.*?' + REGEX
-USAGE_SUBSTRING = 'usage'
 REFRESH_MENU = 'Refresh'
-APP_NAME = 'Telkom'
+REFRESH_INTERVAL = 10*60
 REMAINDER_KEY = 'remainder'
+USAGE_SUBSTRING = 'usage'
 UPDATING_MESSAGE = 'Updating...'
 ERROR_MESSAGE = 'Error'
+
+# Telkom constants
+LOGIN_URL = 'https://secure.telkomsa.net/titracker/servlet/LoginServlet'
+HTTP_HEADERS = {'User-Agent': 'Mozilla/5.0'}
+USERNAME_HTML_ID = 'ID_Field'
+PASSWORD_HTML_ID = 'PW_field'
 
 def get_page(username, password):
     """
@@ -92,7 +95,7 @@ def refresh_callback(_):
     logger.info(REFRESH_MENU)
     reload_info()
 
-@rumps.timer(1*60)
+@rumps.timer(REFRESH_INTERVAL)
 def reload_info_callback(sender):
     """
     Timer callback for reloading usage info.
