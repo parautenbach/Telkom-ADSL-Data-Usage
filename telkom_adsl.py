@@ -6,7 +6,9 @@ import os
 import re
 import requests
 import rumps
+import warnings
 from bs4 import BeautifulSoup
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 # Main constants
 APP_NAME = 'Telkom'
@@ -36,8 +38,10 @@ def get_page(username, password):
     """
     login_payload = {USERNAME_HTML_ID: username, PASSWORD_HTML_ID: password}
     session = requests.Session()
-    response = session.post(LOGIN_URL, headers=HTTP_HEADERS, data=login_payload, verify=False)
-    return response.text
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=InsecureRequestWarning)
+        response = session.post(LOGIN_URL, headers=HTTP_HEADERS, data=login_payload, verify=False)
+        return response.text
 
 def extract_data(html):
     """
