@@ -113,12 +113,12 @@ def main():
     """
     Main application.
     """
-    global app, info
-    refresh = rumps.MenuItem(REFRESH_MENU)#, 
-                             #icon='{0}/icons/refresh_24x24.png'.format(p), 
-                             #dimensions=(16, 16))
+    global app, app_path, info
+    refresh = rumps.MenuItem(REFRESH_MENU, 
+                             icon='{0}/icons/refresh_24x24.png'.format(app_path), 
+                             dimensions=(16, 16))
     app = rumps.App(APP_NAME,
-                    #icon='{0}/icons/app_24x24.png'.format(p),
+                    icon='{0}/icons/telkom_24x24.png'.format(app_path),
                     menu=(refresh, None))
     app.run()
 
