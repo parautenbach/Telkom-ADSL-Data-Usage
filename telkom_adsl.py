@@ -1,5 +1,7 @@
 # Imports
 import json
+import logging.config
+import os
 import re
 import requests
 import rumps
@@ -19,6 +21,8 @@ USAGE_SUBSTRING = 'usage'
 REFRESH_MENU = 'Refresh'
 APP_NAME = 'Telkom'
 REMAINDER_KEY = 'remainder'
+UPDATING_MESSAGE = 'Updating...'
+ERROR_MESSAGE = 'Error'
 
 def get_page(username, password):
     """
@@ -55,32 +59,31 @@ def parse_remainder(data):
 def reload_info():
     """
     """
-    global app
-    old_title = app.title
-    app.title = 'Updating...'
+    global app, logger
+    try:
+        old_title = app.title
+        app.title = UPDATING_MESSAGE
 
-    username = 'foo'
-    password = 'bar'
-    html = get_page(username, password)
-    data = extract_data(html)
-    remainder = parse_remainder(data)
-    info = {
-        REMAINDER_KEY: remainder
-    }
-    print(remainder[0] + ': ' +  remainder[1] + ' (' + remainder[2] + '%)')
-    app.title = '{0} ({1}%)'.format(info[REMAINDER_KEY][1], info[REMAINDER_KEY][2])
+        username = 'foo'
+        password = 'bar'
+        html = get_page(username, password)
+        data = extract_data(html)
+        remainder = parse_remainder(data)
+        info = {
+            REMAINDER_KEY: remainder
+        }
+        logger.info(remainder[0] + ': ' +  remainder[1] + ' (' + remainder[2] + '%)')
+        app.title = '{0} ({1}%)'.format(info[REMAINDER_KEY][1], info[REMAINDER_KEY][2])
+    except Exception, e:
+        logger.exception(e)
+        app.title = ERROR_MESSAGE
+
 
 @rumps.clicked(REFRESH_MENU)
 def refresh_callback(_):
-    print(REFRESH_MENU)
-    #global info
-    try:
-    #    last_update = info['last_update']
-    #    info['last_update'] = None
-        reload_info()
-    except Exception, e:
-        print(e)
-    #    info['last_update'] = last_update
+    global logger
+    logger.info(REFRESH_MENU)
+    reload_info()
 
 @rumps.timer(1*60)
 def reload_info_callback(sender):
@@ -94,16 +97,19 @@ def reload_info_callback(sender):
     #thread.start()
     refresh_callback(None)
 
+def get_logger(conf_path):
+    """
+    Initialise the logger from a config file.
+    """
+    logging.config.fileConfig(conf_path)
+    logger = logging.getLogger()
+    return logger
+
 def main():
     """
     Main application.
     """
-    #global logger, app, info
     global app, info
-    #timer = rumps.Timer(reload_info_callback, 5)
-    #summary = rumps.MenuItem('Summary')#, 
-                             #icon='{0}/icons/summary_24x24.png'.format(p), 
-                             #dimensions=(16, 16))
     refresh = rumps.MenuItem(REFRESH_MENU)#, 
                              #icon='{0}/icons/refresh_24x24.png'.format(p), 
                              #dimensions=(16, 16))
@@ -116,12 +122,11 @@ if __name__ == "__main__":
     """
     Bootstrap.
     """
-    #p = os.path.dirname(os.path.abspath(__file__))
-    #l = "{0}/conf/logger.conf".format(p)
-    #logger = get_logger(l)
+    app_path = os.path.dirname(os.path.abspath(__file__))
+    logger_conf = '{0}/conf/logger.conf'.format(app_path)
+    logger = get_logger(logger_conf)
     info = {}
-    #try:
-    main()
-    #except Exception, e:
-    #    pass
-    #    #logger.exception(e)
+    try:
+        main()
+    except Exception, e:
+        logger.exception(e)
