@@ -2,6 +2,7 @@
 import json
 import re
 import requests
+import rumps
 from bs4 import BeautifulSoup
 
 # Constants
@@ -35,6 +36,8 @@ def extract_data(html):
 
 def parse_remainder(data):
     """
+
+    :return: Tuple of (remain_label, data_string, data_percentage_string)
     """
     match = re.search(REGEX, data.text, flags=re.MULTILINE|re.DOTALL)
     # we don't know which group is the usage and which the remainder
@@ -44,19 +47,67 @@ def parse_remainder(data):
     else:
         usage = match.groups()[0:3]
         remainder = match.groups()[3:6]
-    return remainder
+    return (remainder[1], remainder[2], remainder[0])
+
+def reload_info():
+    """
+    """
+    global app
+    old_title = app.title
+    app.title = "Updating..."
+
+    username = 'foo'
+    password = 'bar'
+    html = get_page(username, password)
+    data = extract_data(html)
+    remainder = parse_remainder(data)
+    info = {
+        'remainder': remainder
+    }
+    print(remainder[0] + ': ' +  remainder[1] + ' (' + remainder[2] + '%)')
+    app.title = "{0} ({1}%)".format(info['remainder'][1], info['remainder'][2])
+
+@rumps.clicked('Refresh')
+def refresh_callback(_):
+    print('Refresh!')
+    #global info
+    try:
+    #    last_update = info['last_update']
+    #    info['last_update'] = None
+        reload_info()
+    except Exception, e:
+        print(e)
+    #    info['last_update'] = last_update
+
+@rumps.timer(1*60)
+def reload_info_callback(sender):
+    """
+    Timer callback for reloading all info.
+    """
+    # We don't use any locking, as we assume that the interval between runs will be less
+    # than the time to retrieve the data
+    #thread = threading.Thread(target=reload_info)
+    #thread.daemon = True
+    #thread.start()
+    refresh_callback(None)
 
 def main():
     """
     Main application.
     """
     #global logger, app, info
-    username = 'rautenbach2015@telkomsa.net'
-    password = 'Rvewzs@9'
-    html = get_page(username, password)
-    data = extract_data(html)
-    remainder = parse_remainder(data)
-    print(remainder[1] + ': ' +  remainder[2] + ' (' + remainder[0] + '%)')
+    global app, info
+    #timer = rumps.Timer(reload_info_callback, 5)
+    #summary = rumps.MenuItem('Summary')#, 
+                             #icon='{0}/icons/summary_24x24.png'.format(p), 
+                             #dimensions=(16, 16))
+    refresh = rumps.MenuItem('Refresh')#, 
+                             #icon='{0}/icons/refresh_24x24.png'.format(p), 
+                             #dimensions=(16, 16))
+    app = rumps.App('Telkom',
+                    #icon='{0}/icons/app_24x24.png'.format(p),
+                    menu=(refresh, None))
+    app.run()
 
 if __name__ == "__main__":
     """
@@ -65,7 +116,7 @@ if __name__ == "__main__":
     #p = os.path.dirname(os.path.abspath(__file__))
     #l = "{0}/conf/logger.conf".format(p)
     #logger = get_logger(l)
-    #info = {}
+    info = {}
     #try:
     main()
     #except Exception, e:
