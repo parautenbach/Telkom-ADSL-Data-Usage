@@ -10,8 +10,7 @@ Tiny macOS tray app for indicating Telkom ADSL data usage.
 # Installation
 * Download the latest version
 * Copy it to your `Applications` folder
-* Edit the application config in the app bundle;
-* * `~/Applications/Telkom ADSL Usage.app/Contents/Resources/conf/telkom.conf`
+* Edit the application config in the app bundle: `~/Applications/Telkom ADSL Usage.app/Contents/Resources/conf/telkom.conf`
 * Run the app
 * Right click on it in the doc and select the setting to start it at login
 
@@ -20,7 +19,7 @@ Check the log in the app bundle:
 `~/Applications/Telkom ADSL Usage.app/Contents/Resources/telkom.log`
 
 # Development
-* Install py2app
+* Install [py2app](https://py2app.readthedocs.io/en/latest/)
 * Run `./make.sh`
 
 # Credits
