@@ -6,7 +6,7 @@ import rumps
 from bs4 import BeautifulSoup
 
 # Constants
-LOGIN_URL = "https://secure.telkomsa.net/titracker/servlet/LoginServlet"
+LOGIN_URL = 'https://secure.telkomsa.net/titracker/servlet/LoginServlet'
 HTTP_HEADERS = {'User-Agent': 'Mozilla/5.0'}
 USERNAME_HTML_ID = 'ID_Field'
 PASSWORD_HTML_ID = 'PW_field'
@@ -16,6 +16,9 @@ PASSWORD_HTML_ID = 'PW_field'
 REGEX = 'value:.*?(\d+).*?label:.*?\'(.*?)\'.*?formatted:.*?\'(.*?)\''
 REGEX = REGEX + '.*?' + REGEX
 USAGE_SUBSTRING = 'usage'
+REFRESH_MENU = 'Refresh'
+APP_NAME = 'Telkom'
+REMAINDER_KEY = 'remainder'
 
 def get_page(username, password):
     """
@@ -54,7 +57,7 @@ def reload_info():
     """
     global app
     old_title = app.title
-    app.title = "Updating..."
+    app.title = 'Updating...'
 
     username = 'foo'
     password = 'bar'
@@ -62,14 +65,14 @@ def reload_info():
     data = extract_data(html)
     remainder = parse_remainder(data)
     info = {
-        'remainder': remainder
+        REMAINDER_KEY: remainder
     }
     print(remainder[0] + ': ' +  remainder[1] + ' (' + remainder[2] + '%)')
-    app.title = "{0} ({1}%)".format(info['remainder'][1], info['remainder'][2])
+    app.title = '{0} ({1}%)'.format(info[REMAINDER_KEY][1], info[REMAINDER_KEY][2])
 
-@rumps.clicked('Refresh')
+@rumps.clicked(REFRESH_MENU)
 def refresh_callback(_):
-    print('Refresh!')
+    print(REFRESH_MENU)
     #global info
     try:
     #    last_update = info['last_update']
@@ -101,10 +104,10 @@ def main():
     #summary = rumps.MenuItem('Summary')#, 
                              #icon='{0}/icons/summary_24x24.png'.format(p), 
                              #dimensions=(16, 16))
-    refresh = rumps.MenuItem('Refresh')#, 
+    refresh = rumps.MenuItem(REFRESH_MENU)#, 
                              #icon='{0}/icons/refresh_24x24.png'.format(p), 
                              #dimensions=(16, 16))
-    app = rumps.App('Telkom',
+    app = rumps.App(APP_NAME,
                     #icon='{0}/icons/app_24x24.png'.format(p),
                     menu=(refresh, None))
     app.run()
