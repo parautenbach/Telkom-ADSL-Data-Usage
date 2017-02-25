@@ -24,4 +24,4 @@ Check the log in the app bundle:
 * Run `./make.sh`
 
 # Credits
-Thank you to [dryicons](http://dryicons.com/) for the [Coquette Icon Set](http://dryicons.com/free-icons/preview/coquette-icons-set/). 
+Thank you to [dryicons](http://dryicons.com/) for the [Coquette Icon Set](http://dryicons.com/free-icons/preview/coquette-icons-set/). ICNS made with [iConvert Icons](https://iconverticons.com/online/).
