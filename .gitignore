@@ -1,0 +1,6 @@
+*.log
+*.pyc
+build
+dist
+*.egg*
+telkom.conf.bak
