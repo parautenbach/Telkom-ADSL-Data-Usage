@@ -24,6 +24,14 @@ USAGE_SUBSTRING = 'usage'
 UPDATING_MESSAGE = 'Updating...'
 ERROR_MESSAGE = 'Error'
 
+# Path constants
+CONF_TEMPLATE_PATH = '{0}/conf/{1}'
+APP_CONF = 'telkom.conf'
+LOGGER_CONF = 'logger.conf'
+ICONS_TEMPLATE_PATH = '{0}/icons/{1}'
+APP_ICON = 'telkom_24x24.png'
+REFRESH_ICON = 'refresh_24x24.png'
+
 # Telkom constants
 LOGIN_URL = 'https://secure.telkomsa.net/titracker/servlet/LoginServlet'
 HTTP_HEADERS = {'User-Agent': 'Mozilla/5.0'}
@@ -121,16 +129,16 @@ def main():
     global app, app_path, username, password, info
     logger.info('Reading config')
     config_parser = ConfigParser.SafeConfigParser()
-    with open('{0}/conf/telkom.conf'.format(app_path)) as config_file:
+    with open(CONF_TEMPLATE_PATH.format(app_path, APP_CONF)) as config_file:
         config_parser.readfp(config_file)
         username = config_parser.get('default', 'username')
         password = config_parser.get('default', 'password')
     logger.info('Username:' + username)
     refresh = rumps.MenuItem(REFRESH_MENU, 
-                             icon='{0}/icons/refresh_24x24.png'.format(app_path), 
+                             icon=ICONS_TEMPLATE_PATH.format(app_path, REFRESH_ICON), 
                              dimensions=(16, 16))
     app = rumps.App(APP_NAME,
-                    icon='{0}/icons/telkom_24x24.png'.format(app_path),
+                    icon=ICONS_TEMPLATE_PATH.format(app_path, APP_ICON),
                     menu=(refresh, None))
     logger.info('Running')
     app.run()
@@ -140,7 +148,7 @@ if __name__ == "__main__":
     Bootstrap.
     """
     app_path = os.path.dirname(os.path.abspath(__file__))
-    logger_conf = '{0}/conf/logger.conf'.format(app_path)
+    logger_conf = CONF_TEMPLATE_PATH.format(app_path, LOGGER_CONF)
     logger = get_logger(logger_conf)
     info = {}
     username = None
