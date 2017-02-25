@@ -50,7 +50,7 @@ def get_page(username, password):
     login_payload = {USERNAME_HTML_ID: username, PASSWORD_HTML_ID: password}
     session = requests.Session()
     with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", category=InsecureRequestWarning)
+        warnings.filterwarnings('ignore', category=InsecureRequestWarning)
         response = session.post(LOGIN_URL, headers=HTTP_HEADERS, data=login_payload, verify=False)
         return response.text
 
@@ -84,6 +84,7 @@ def parse_remainder(script):
 
 def reload_info():
     """
+    Reload usage info.
     """
     global app, logger, username, password
     try:
@@ -120,6 +121,8 @@ def reload_info_callback(sender):
 def get_logger(conf_path):
     """
     Initialise the logger from a config file.
+
+    :return: Logger instance
     """
     logging.config.fileConfig(conf_path)
     logger = logging.getLogger()
