@@ -147,6 +147,7 @@ def main():
                     icon=ICONS_TEMPLATE_PATH.format(app_path, APP_ICON),
                     menu=(refresh, None))
     logger.info('Running')
+    app.title = APP_NAME
     app.run()
 
 if __name__ == "__main__":
