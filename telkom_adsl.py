@@ -26,6 +26,9 @@ ERROR_MESSAGE = 'Error'
 
 def get_page(username, password):
     """
+    Get a web page as plain text HTML. 
+
+    :return: HTML data
     """
     login_payload = {USERNAME_HTML_ID: username, PASSWORD_HTML_ID: password}
     session = requests.Session()
@@ -34,19 +37,23 @@ def get_page(username, password):
 
 def extract_data(html):
     """
+    Extract the script that contains the usage data.
+
+    :return: The script element as a string
     """
     soup = BeautifulSoup(html, 'html.parser')
     scripts = []
     for script in soup.findAll('script'):
         scripts.append(script)
-    return scripts[7]
+    return scripts[7].text
 
-def parse_remainder(data):
+def parse_remainder(script):
     """
+    Parse the remaining data from the given script tag.
 
     :return: Tuple of (remain_label, data_string, data_percentage_string)
     """
-    match = re.search(REGEX, data.text, flags=re.MULTILINE|re.DOTALL)
+    match = re.search(REGEX, script, flags=re.MULTILINE|re.DOTALL)
     # we don't know which group is the usage and which the remainder
     if USAGE_SUBSTRING in match.groups()[4]:
         usage = match.groups()[3:6]
@@ -78,9 +85,11 @@ def reload_info():
         logger.exception(e)
         app.title = ERROR_MESSAGE
 
-
 @rumps.clicked(REFRESH_MENU)
 def refresh_callback(_):
+    """
+    Refresh menu item's click action.
+    """
     global logger
     logger.info(REFRESH_MENU)
     reload_info()
@@ -88,13 +97,8 @@ def refresh_callback(_):
 @rumps.timer(1*60)
 def reload_info_callback(sender):
     """
-    Timer callback for reloading all info.
+    Timer callback for reloading usage info.
     """
-    # We don't use any locking, as we assume that the interval between runs will be less
-    # than the time to retrieve the data
-    #thread = threading.Thread(target=reload_info)
-    #thread.daemon = True
-    #thread.start()
     refresh_callback(None)
 
 def get_logger(conf_path):
