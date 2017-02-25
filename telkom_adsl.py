@@ -1,4 +1,5 @@
 # Imports
+import ConfigParser
 import json
 import logging.config
 import os
@@ -66,13 +67,10 @@ def parse_remainder(script):
 def reload_info():
     """
     """
-    global app, logger
+    global app, logger, username, password
     try:
         old_title = app.title
         app.title = UPDATING_MESSAGE
-
-        username = 'foo'
-        password = 'bar'
         html = get_page(username, password)
         data = extract_data(html)
         remainder = parse_remainder(data)
@@ -113,13 +111,21 @@ def main():
     """
     Main application.
     """
-    global app, app_path, info
+    global app, app_path, username, password, info
+    logger.info('Reading config')
+    config_parser = ConfigParser.SafeConfigParser()
+    with open('{0}/conf/telkom.conf'.format(app_path)) as config_file:
+        config_parser.readfp(config_file)
+        username = config_parser.get('default', 'username')
+        password = config_parser.get('default', 'password')
+    logger.info('Username:' + username)
     refresh = rumps.MenuItem(REFRESH_MENU, 
                              icon='{0}/icons/refresh_24x24.png'.format(app_path), 
                              dimensions=(16, 16))
     app = rumps.App(APP_NAME,
                     icon='{0}/icons/telkom_24x24.png'.format(app_path),
                     menu=(refresh, None))
+    logger.info('Running')
     app.run()
 
 if __name__ == "__main__":
@@ -130,6 +136,8 @@ if __name__ == "__main__":
     logger_conf = '{0}/conf/logger.conf'.format(app_path)
     logger = get_logger(logger_conf)
     info = {}
+    username = None
+    password = None
     try:
         main()
     except Exception, e:
