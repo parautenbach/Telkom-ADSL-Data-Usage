@@ -91,11 +91,18 @@ def parse_info(script):
     }
     return info
 
+def set_title():
+    """
+    Set the title according to the latest info.
+    """
+    global app, info, toggle_setting
+    app.title = '{0} ({1}%)'.format(info[toggle_setting][1], info[toggle_setting][2])
+
 def reload_info():
     """
     Reload usage info.
     """
-    global app, logger, username, password, toggle
+    global app, info, logger, username, password, toggle_setting
     try:
         old_title = app.title
         app.title = UPDATING_MESSAGE
@@ -104,7 +111,7 @@ def reload_info():
         info = parse_info(data)
         logger.info(info[REMAINDER_KEY][0] + ': ' +  info[REMAINDER_KEY][1] + ' (' + info[REMAINDER_KEY][2] + '%)')
         logger.info(info[USAGE_KEY][0] + ': ' +  info[USAGE_KEY][1] + ' (' + info[USAGE_KEY][2] + '%)')
-        app.title = '{0} ({1}%)'.format(info[toggle][1], info[toggle][2])
+        set_title()
     except Exception, e:
         logger.exception(e)
         app.title = ERROR_MESSAGE
@@ -113,12 +120,17 @@ def toggle():
     """
     Toggle between usage and remainder.
     """
-    global app, toggle, logger
-    logger.info(app.menu[TOGGLE_MENU])
-    logger.info(toggle)
-    app.menu[TOGGLE_MENU].title = TOGGLE_TEMPLATE.format('foo')
+    global app, toggle_setting, logger
+    try:
+        #logger.info(app.menu[TOGGLE_MENU])
+        logger.info('Before: ' + toggle_setting)
+        toggle_setting = REMAINDER_KEY if toggle_setting == USAGE_KEY else USAGE_KEY
+        logger.info('After: ' + toggle_setting)
+        #app.menu[TOGGLE_MENU].title = TOGGLE_TEMPLATE.format('foo')
+        set_title()
+    except Exception, e:
+        logger.exception(e)
 
-#@rumps.clicked(REFRESH_MENU)
 def refresh_callback(_):
     """
     Refresh menu item's click action.
@@ -127,7 +139,6 @@ def refresh_callback(_):
     logger.info(REFRESH_MENU)
     reload_info()
 
-#@rumps.clicked(TOGGLE_MENU)
 def toggle_callback(_):
     """
     Toggle menu item's click action.
@@ -157,16 +168,16 @@ def main():
     """
     Main application.
     """
-    global app, app_path, username, password, toggle, info
+    global app, app_path, username, password, toggle_setting, info
     logger.info('Reading config')
     config_parser = ConfigParser.SafeConfigParser()
     with open(CONF_TEMPLATE_PATH.format(app_path, APP_CONF)) as config_file:
         config_parser.readfp(config_file)
         username = config_parser.get(CONF_DEFAULT_SECTION, CONF_USERNAME)
         password = config_parser.get(CONF_DEFAULT_SECTION, CONF_PASSWORD)
-        toggle = config_parser.get(CONF_DEFAULT_SECTION, CONF_TOGGLE)
+        toggle_setting = config_parser.get(CONF_DEFAULT_SECTION, CONF_TOGGLE)
     logger.info('Username: ' + username)
-    logger.info('Toggle: ' + toggle)
+    logger.info('Toggle setting: ' + toggle_setting)
     refresh_menu = rumps.MenuItem(REFRESH_MENU, 
                                   callback=refresh_callback,
                                   icon=ICONS_TEMPLATE_PATH.format(app_path, REFRESH_ICON), 
@@ -178,10 +189,6 @@ def main():
                     menu=(refresh_menu, toggle_menu, None))
     logger.info('Running')
     app.title = APP_NAME
-    # app.menu = [
-    #     rumps.MenuItem(REFRESH_MENU, callback=refresh_callback),
-    #     rumps.MenuItem(TOGGLE_MENU, callback=toggle_callback)
-    # ]
     app.run()
 
 if __name__ == "__main__":
