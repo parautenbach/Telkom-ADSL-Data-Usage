@@ -132,6 +132,12 @@ def toggle():
         alt_toggle_setting = _toggle(toggle_setting)
         app.menu[TOGGLE_MENU].title = TOGGLE_TEMPLATE.format(toggle_setting)
         toggle_setting = alt_toggle_setting
+        config_parser = ConfigParser.SafeConfigParser()
+        with open(CONF_TEMPLATE_PATH.format(app_path, APP_CONF), 'rb') as config_file:
+            config_parser.readfp(config_file)
+        config_parser.set(CONF_DEFAULT_SECTION, CONF_TOGGLE, toggle_setting)
+        with open(CONF_TEMPLATE_PATH.format(app_path, APP_CONF), 'wb') as config_file:
+            config_parser.write(config_file)
         logger.info('After: ' + toggle_setting)
         set_title()
     except Exception, e:
@@ -177,7 +183,7 @@ def main():
     global app, app_path, username, password, toggle_setting, info
     logger.info('Reading config')
     config_parser = ConfigParser.SafeConfigParser()
-    with open(CONF_TEMPLATE_PATH.format(app_path, APP_CONF)) as config_file:
+    with open(CONF_TEMPLATE_PATH.format(app_path, APP_CONF), 'rb') as config_file:
         config_parser.readfp(config_file)
         username = config_parser.get(CONF_DEFAULT_SECTION, CONF_USERNAME)
         password = config_parser.get(CONF_DEFAULT_SECTION, CONF_PASSWORD)
