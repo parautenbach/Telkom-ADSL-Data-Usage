@@ -100,7 +100,7 @@ def set_title():
 
 def reload_info():
     """
-    Reload usage info.
+    Reload usage info and update the app title.
     """
     global app, info, logger, username, password, toggle_setting
     try:
@@ -116,17 +116,23 @@ def reload_info():
         logger.exception(e)
         app.title = ERROR_MESSAGE
 
-def toggle():
+def _toggle(setting):
     """
     Toggle between usage and remainder.
     """
+    return REMAINDER_KEY if setting == USAGE_KEY else USAGE_KEY
+
+def toggle():
+    """
+    Toggle between usage and remainder and update the toggle menu.
+    """
     global app, toggle_setting, logger
     try:
-        #logger.info(app.menu[TOGGLE_MENU])
         logger.info('Before: ' + toggle_setting)
-        toggle_setting = REMAINDER_KEY if toggle_setting == USAGE_KEY else USAGE_KEY
+        alt_toggle_setting = _toggle(toggle_setting)
+        app.menu[TOGGLE_MENU].title = TOGGLE_TEMPLATE.format(toggle_setting)
+        toggle_setting = alt_toggle_setting
         logger.info('After: ' + toggle_setting)
-        #app.menu[TOGGLE_MENU].title = TOGGLE_TEMPLATE.format('foo')
         set_title()
     except Exception, e:
         logger.exception(e)
@@ -178,17 +184,18 @@ def main():
         toggle_setting = config_parser.get(CONF_DEFAULT_SECTION, CONF_TOGGLE)
     logger.info('Username: ' + username)
     logger.info('Toggle setting: ' + toggle_setting)
-    refresh_menu = rumps.MenuItem(REFRESH_MENU, 
+    refresh_menu = rumps.MenuItem(title=REFRESH_MENU, 
                                   callback=refresh_callback,
                                   icon=ICONS_TEMPLATE_PATH.format(app_path, REFRESH_ICON), 
                                   dimensions=(16, 16))
-    toggle_menu = rumps.MenuItem(TOGGLE_MENU, 
+    toggle_menu = rumps.MenuItem(title=TOGGLE_MENU,
                                  callback=toggle_callback)
     app = rumps.App(APP_NAME,
                     icon=ICONS_TEMPLATE_PATH.format(app_path, APP_ICON),
                     menu=(refresh_menu, toggle_menu, None))
     logger.info('Running')
     app.title = APP_NAME
+    app.menu[TOGGLE_MENU].title = TOGGLE_TEMPLATE.format(_toggle(toggle_setting))
     app.run()
 
 if __name__ == "__main__":
