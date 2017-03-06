@@ -28,7 +28,7 @@ OPTIONS = {
 setup(
     app=APP,
     name='Telkom ADSL Data Usage',
-    version='1.0.0',
+    version='1.1.0',
     description='Status Item app to monitor Telkom ADSL data usage.',
     author='Pieter Rautenbach',
     url='http://www.whatsthatlight.com/',
