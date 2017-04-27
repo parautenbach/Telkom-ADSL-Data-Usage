@@ -30,6 +30,10 @@ CONF_DEFAULT_SECTION = 'default'
 CONF_USERNAME = 'username'
 CONF_PASSWORD = 'password'
 CONF_TOGGLE = 'toggle'
+TRAY_PREFIX = {
+    USAGE_KEY: 'U: ',
+    REMAINDER_KEY: 'R: '
+}
 
 # Path constants
 CONF_TEMPLATE_PATH = '{0}/conf/{1}'
@@ -96,7 +100,7 @@ def set_title():
     Set the title according to the latest info.
     """
     global app, info, toggle_setting
-    app.title = '{0} ({1}%)'.format(info[toggle_setting][1], info[toggle_setting][2])
+    app.title = '{0}{1} ({2}%)'.format(TRAY_PREFIX[toggle_setting], info[toggle_setting][1], info[toggle_setting][2])
 
 def reload_info():
     """
